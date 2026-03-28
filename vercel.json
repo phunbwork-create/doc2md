@@ -1,4 +1,5 @@
 {
+  "name": "doc2md-template",
   "builds": [
     {
       "src": "app.py",
