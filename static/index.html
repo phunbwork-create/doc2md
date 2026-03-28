@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Doc2MD Template Analyzer - Upload file .docx và nhận template Markdown chi tiết">
+    <title>Doc2MD — Template Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-bg"></div>
+    
+    <!-- Header -->
+    <header class="header" id="app-header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Doc2MD</h1>
+                    <p class="logo-tagline">Template Analyzer</p>
+                </div>
+            </div>
+            <div class="header-badge">
+                <span class="badge-dot"></span>
+                <span>Sẵn sàng phân tích</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Upload Section -->
+        <section class="upload-section" id="upload-section">
+            <div class="section-header">
+                <div class="step-badge">01</div>
+                <div>
+                    <h2>Upload tài liệu</h2>
+                    <p class="section-desc">Kéo thả hoặc chọn file .docx (SRS, BRD, PRD...)</p>
+                </div>
+            </div>
+
+            <div class="dropzone" id="dropzone">
+                <div class="dropzone-content">
+                    <div class="dropzone-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <p class="dropzone-text">Kéo & thả file <strong>.docx</strong> vào đây</p>
+                    <p class="dropzone-hint">hoặc</p>
+                    <button class="btn-browse" id="btn-browse">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        Chọn file từ máy tính
+                    </button>
+                    <input type="file" id="file-input" accept=".docx" hidden>
+                </div>
+
+                <!-- File info (shown after selecting) -->
+                <div class="file-info" id="file-info" hidden>
+                    <div class="file-info-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <div class="file-info-details">
+                        <p class="file-name" id="file-name"></p>
+                        <p class="file-size" id="file-size"></p>
+                    </div>
+                    <button class="btn-remove" id="btn-remove" title="Xóa file">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn-analyze" id="btn-analyze" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Phân tích tài liệu
+            </button>
+        </section>
+
+        <!-- Loading Overlay -->
+        <section class="loading-section" id="loading-section" hidden>
+            <div class="loader-container">
+                <div class="loader-ring">
+                    <div class="loader-ring-inner"></div>
+                </div>
+                <div class="loader-text">
+                    <h3>Đang phân tích tài liệu...</h3>
+                    <p id="loading-status">Đọc cấu trúc file .docx</p>
+                </div>
+            </div>
+            <div class="loader-steps">
+                <div class="loader-step active" id="step-read">
+                    <div class="step-dot"></div>
+                    <span>Đọc file</span>
+                </div>
+                <div class="loader-step" id="step-styles">
+                    <div class="step-dot"></div>
+                    <span>Phân tích styles</span>
+                </div>
+                <div class="loader-step" id="step-content">
+                    <div class="step-dot"></div>
+                    <span>Phân tích nội dung</span>
+                </div>
+                <div class="loader-step" id="step-generate">
+                    <div class="step-dot"></div>
+                    <span>Tạo template</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Result Section -->
+        <section class="result-section" id="result-section" hidden>
+            <div class="section-header">
+                <div class="step-badge done">02</div>
+                <div>
+                    <h2>Kết quả phân tích</h2>
+                    <p class="section-desc" id="result-filename"></p>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar" id="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-lines">0</span>
+                    <span class="stat-label">Dòng MD</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-size">0</span>
+                    <span class="stat-label">Kích thước</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-original">0</span>
+                    <span class="stat-label">File gốc</span>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="result-toolbar">
+                <div class="toolbar-tabs">
+                    <button class="tab-btn active" id="tab-preview" data-tab="preview">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        Preview
+                    </button>
+                    <button class="tab-btn" id="tab-source" data-tab="source">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"/>
+                            <polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                        Source
+                    </button>
+                </div>
+                <div class="toolbar-actions">
+                    <button class="btn-copy" id="btn-copy" title="Copy to clipboard">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        Copy
+                    </button>
+                    <button class="btn-download" id="btn-download">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download .md
+                    </button>
+                    <button class="btn-download-docx" id="btn-download-docx">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        Download .docx
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Content Area -->
+            <div class="result-content">
+                <div class="content-pane" id="pane-preview">
+                    <div class="markdown-preview" id="markdown-preview"></div>
+                </div>
+                <div class="content-pane" id="pane-source" hidden>
+                    <pre class="source-code"><code id="source-code"></code></pre>
+                </div>
+            </div>
+
+            <!-- Analyze Another -->
+            <button class="btn-another" id="btn-another">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                Phân tích file khác
+            </button>
+        </section>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast" hidden>
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
